@@ -13,17 +13,17 @@
     <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>Password</th>
         <th>Email</th>
+        <th>Age</th>
     </tr>
     </thead>
     <tbody>
-    <c:forEach var="listUser" items="${listUser}">
+    <c:forEach var="listUser" items="${data}">
         <tr>
-            <td>${listUser.ID}</td>
+            <td>${listUser.id}</td>
             <td>${listUser.name}</td>
-            <td>${listUser.password}</td>
             <td>${listUser.email}</td>
+            <td>${listUser.age}</td>
         </tr>
     </c:forEach>
     </tbody>
