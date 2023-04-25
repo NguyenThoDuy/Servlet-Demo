@@ -1,6 +1,6 @@
 package com.example.demo_servlet.config;
-
 import lombok.SneakyThrows;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
     private static String DB_URL = "jdbc:mysql://127.0.0.1:3306/servlet-demo";
     private static String USER_NAME = "root";
-    private static String PASSWORD = "123456";
+    private static String PASSWORD = "qaszxc@123";
 
     @SneakyThrows
     public static Connection connection() throws SQLException {
@@ -24,7 +24,7 @@ public class DatabaseConnection {
         }
     }
 
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         return connection();
     }
 }
