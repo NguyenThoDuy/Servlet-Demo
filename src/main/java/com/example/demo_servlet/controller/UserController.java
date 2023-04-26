@@ -9,16 +9,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-
-@WebServlet({"/user", "/user/detail", "/user/update"})
+//@WebServlet({"/user"}) thiết lập các đường dẫn (URLs) của các chức năng quản lý người dùng trong một ứng dụng web Java Servlet.
+@WebServlet({"/user", "/user/new", "/user/save", "/user/detail", "/user/edit", "/user/update", "/user/delete", "/user/redirectHome"})
 public class UserController extends BaseController {
-    private UserService userService;
+    private transient UserService userService;
 
     @Override
     public void init() throws ServletException {
         userService = new UserServiceImpl();
     }
 
+    // kiểm tra user đang gọi tới phương thức nào và điều hướng nó tới phương thức đó
+    @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String method = request.getMethod();
         switch (method) {
@@ -28,49 +30,66 @@ public class UserController extends BaseController {
             case "POST":
                 doPost(request, response);
                 break;
+            default:
+                break;
         }
     }
 
+    //doGet() nơi xử lý các yêu cầu theo phương thức GET
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String uri = request.getRequestURI();
+        String uri = request.getServletPath();
         try {
             switch (uri) {
-                case "/Servlet_Demo_war/user":
-                    requestProcessinggetAll(request, response, userService.getAllUser(), "user.jsp");
+                case "/user":
+                    requestProcessinggetAll(request, response, userService.getAllUser(), "index.jsp");
                     break;
-                case "/Servlet_Demo_war/user/detail":
-                    requestProcessingDetail(request, response, userService.detail(getUserId(request)), "addform.jsp");
+                case "/user/new":
+                    showNewForm(request, response, "/view/userForm.jsp");
+                    break;
+                case "/user/detail":
+                    requestProcessingDetail(request, response, userService.detail(getUserId(request)), "/view/userForm.jsp");
+                    break;
+                case "/user/delete":
+                    userService.delete(getUserId(request));
+                    response.sendRedirect(request.getContextPath().concat("/user"));
                     break;
                 default:
+                    response.sendRedirect(request.getContextPath().concat("/user"));
                     break;
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            e.printStackTrace();
         }
     }
 
+
+    //doPost() nơi xử lý các yêu cầu theo phương thức POST
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        String uri = request.getRequestURI();
+        String uri = request.getServletPath();
+        String contextPath = request.getContextPath();
         try {
+            //kiểm tra user đang gọi url nào và điều hướng tới service
             switch (uri) {
-                case "/Servlet_Demo_war/user/update":
-                    userService.update(request);
-                    requestProcessingDetail(request, response, userService.detail(request.getParameter("id")), "addform.jsp");
+                case "/user/save":
+                    int newId = userService.save(request);
+                    // sendRedirect  thực hiện điều hớn tới url khác
+                    response.sendRedirect(contextPath + "/user/detail?id=" + newId);
                     break;
-                case "/Servlet_Demo_war/user/detail":
-                    requestProcessingDetail(request, response, userService.detail(request.getParameter("id")), "addform.jsp");
+                case "/user/update":
+                    userService.update(request);
+                    response.sendRedirect(contextPath + "/user/detail?id=" + getUserId(request));
                     break;
                 default:
                     break;
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private String getUserId(HttpServletRequest request){
+    private String getUserId(HttpServletRequest request) {
         return request.getParameter("id");
     }
 }
